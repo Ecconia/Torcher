@@ -1,0 +1,7 @@
+name: Torcher
+version: 0
+main: de.ecconia.bukkit.plugin.torcher.Torcher
+author: Ecconia
+commands:
+    torcher:
+        description: Place torches in a ROM automatically.
