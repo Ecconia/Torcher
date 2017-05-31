@@ -82,10 +82,11 @@ public class Torcher extends JavaPlugin
 				Selection s = WorldEditHelper.getSelection(player, prefix);
 				if (s == null) { return true; }
 				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint());
-				if (rom != null)
+				if (rom != null && rom.config(player, args))
 				{
 					roms.put(player.getUniqueId(), rom);
-					player.sendMessage(prefix + "ROM with " + rom.getAddresses() + " addresses of each " + rom.getBitwidth() + " bits defined. " + " Direction: " + rom.getDirectionString());
+					player.sendMessage(prefix + "Defined ROM with direction " + rom.getDirection());
+					player.sendMessage(prefix + rom.getROMInfo());
 				}
 			}
 			else

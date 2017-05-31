@@ -1,39 +1,26 @@
 package de.ecconia.bukkit.plugin.torcher;
 
-import org.bukkit.ChatColor;
+import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Torch;
 
 public class PlayerROM
 {
-	//Location info
-	private final Location min;
-	private final Location max;
-	private final TorchDirection direction;
-
-	//BitPosition
-	private final int maxCounter;
-	private int counter;
-
-	//Start point
-	private final int xs;
-	private final int ys;
-	private final int zs;
-
-	//bitsInformation
-	private final int bitsPerLayer;
-	private final int bitsPerLine;
+	// Location information
+	private Location min;
+	private Location max;
+	private TorchDirection direction;
+	
+	//ROM Settings
+	private ROMSettings romSettings;
 
 	//Factory begin///////////////////////////////////////////////////////////////
 
 	public static PlayerROM create(Player player, Location min, Location max)
 	{
 		TorchDirection direction = TorchDirection.create(player);
-		if (direction == null) { return null; }
+		if (direction == null) { return null;}
 
 		//Check width: (must be odd)
 		if (isOddWidth(min, max, direction))
@@ -123,149 +110,148 @@ public class PlayerROM
 		this.min = min;
 		this.max = max;
 		this.direction = direction;
-
-		bitsPerLine = widthDiff(min, max, direction) / 2 + 1;
-		bitsPerLayer = bitsPerLine * (lengthDiff(min, max, direction) + 1) / 2;
-
-		//calculate max
-		counter = 0;
-		maxCounter = getAddresses() * bitsPerLine;
-
-		xs = direction.isMaxX() ? max.getBlockX() : min.getBlockX();
-		ys = max.getBlockY();
-		zs = direction.isMaxZ() ? max.getBlockZ() : min.getBlockZ();
-
+	}
+	
+	
+	// Command format: 
+	// /torcher setrom ws:#number config:-w-l-h flip:true
+	public boolean config(Player player, String[] para)
+	{
+		int wordSize = 0;
+		int[] romOrder = null;
+		boolean[] reverse = null;
+		boolean flip = false;
+		
+		for(int i = 1; i < para.length; i++)
+		{
+			String str = para[i];
+			
+			if(str.startsWith("ws:"))
+			{
+				if(NumberUtils.isNumber(str.substring(str.indexOf(':') + 1)))
+				{
+					wordSize = Integer.parseInt(str.substring(str.indexOf(':') + 1));
+				}
+				else
+				{
+					player.sendMessage(Torcher.prefix + "Illegal non-numeric argument: " + str);
+					return false;
+				}
+			}
+			else if(str.startsWith("config:"))
+			{
+				romOrder = new int[3];
+				reverse = new boolean[3];
+				
+				String s = str.substring(str.indexOf(':') + 1);
+				
+				int count = 0;
+				
+				for(int j = s.length() - 1; j >= 0; j--)
+				{	
+					if(count > 2)
+					{
+						player.sendMessage(Torcher.prefix + "Illegal argument format: " + str);
+						return false;
+					}
+					
+					boolean r = false;
+					
+					if(j != 0)
+					{
+						r = s.charAt(j - 1) == '-';
+					}
+					
+					if(s.charAt(j) == 'w')
+					{
+						reverse[0] = r;
+						romOrder[2 - count] = 0;
+					}
+					else if(s.charAt(j) == 'l')
+					{
+						reverse[1] = r;
+						romOrder[2 - count] = 1;
+					}
+					else if(s.charAt(j) == 'h')
+					{
+						reverse[2] = r;
+						romOrder[2 - count] = 2;
+					}
+					else
+					{
+						player.sendMessage(Torcher.prefix + "Illegal character in argument: " + str);
+						return false;
+					}
+					
+					if(r)
+					{
+						s = s.substring(0, s.length() - 2);
+						j--;
+					}
+					else
+					{
+						s = s.substring(0, s.length() - 1);
+					}
+					
+					count++;
+				}
+				
+				if(romOrder[0] == romOrder[1] || romOrder[0] == romOrder[2] || romOrder[1] == romOrder[2])
+				{
+					player.sendMessage(Torcher.prefix + "Illegal argument format: " + str);
+					return false;
+				}
+			}
+			else if(str.startsWith("flip:"))
+			{
+				if(str.substring(str.indexOf(':') + 1).equals("true"))
+				{
+					flip = true;
+				}
+				else if(str.substring(str.indexOf(':') + 1).equals("false"))
+				{
+					flip = false;
+				}
+				else
+				{
+					player.sendMessage(Torcher.prefix + "Illegal argument: " + str);
+					return false;
+				}	
+			}
+			else
+			{
+				player.sendMessage(Torcher.prefix + "Illegal argument: " + str);
+				return false;
+			}
+		}
+		
+		romSettings = ROMSettings.create(player, min, max, Math.abs(wordSize), direction, romOrder == null ? new int[]{2, 1, 0} : romOrder, 
+				reverse == null ? new boolean[]{false, false, false} : reverse, flip);
+		
+		if(romSettings == null)
+		{
+			return false;
+		}
+		
+		return true;
 	}
 
 	public void resetCounter(Player player)
 	{
-		counter = 0;
-		player.sendMessage(Torcher.prefix + "Last paste position has been resetted.");
+		romSettings.resetCounter(player);
 	}
 
 	public void dataInput(Player player, String para)
 	{
-		final int bitMax = 15;
-		int counter = 0;
-		boolean bits[] = new boolean[para.length() * 15];
-
-		doublebreak:
-		{
-			for (int letter = 0; letter < para.length(); letter++)
-			{
-				int number = para.charAt(letter) - 256;
-				//	String filler = "";
-				//	for (int i = 0; i < (bitMax - Integer.toBinaryString(number).length()); i++)
-				//	{
-				//		filler += '0';
-				//	}
-				//	player.sendMessage("Processing: " + filler + Integer.toBinaryString(number) + " " + number);
-				for (int bit = 0; bit < bitMax; bit++)
-				{
-					if (this.counter + counter < maxCounter)
-					{
-						bits[counter++] = ((number & (1 << bit)) > 0 ? true : false);
-					}
-					else
-					{
-						break doublebreak;
-					}
-				}
-			}
-		}
-		int bitsLeft = (para.length() * 15) - counter;
-		player.sendMessage(Torcher.prefix + "Read " + counter + " bits. " + (bitsLeft > 14 ? "You send more data then the ROM can hold. " + bitsLeft + " bits are left." : ""));
-		//	String code = "Code: ";
-		//	or (int offset = 0; offset < counter; offset += 4)
-		//	{
-		//		try
-		//		{
-		//			code += (int) (((bits[offset] ? 1 : 0) << 0) | ((bits[offset + 1] ? 1 : 0) << 1) | ((bits[offset + 2] ? 1 : 0) << 2) | ((bits[offset + 3] ? 1 : 0) << 3));
-		//			code += " ";
-		//		}
-		//		catch (Exception e)
-		//		{
-		//			player.sendMessage(e.getClass().getSimpleName());
-		//		}
-		//	}
-		//	player.sendMessage(code);
-		placeTorches(player, counter, bits);
+		romSettings.dataInput(player, para);
 	}
-
-	private void placeTorches(Player player, int amount, boolean[] data)
+	
+	public String getROMInfo()
 	{
-		Location loc = null;
-		boolean broke = false;
-		for (int i = 0; i < amount; i++)
-		{
-			loc = getTorchLocation(i + counter);
-			BlockState state = loc.getBlock().getState();
-			Material oldType = state.getType();
-			if (oldType.equals(Material.AIR) || oldType.equals(Material.REDSTONE_TORCH_OFF) || oldType.equals(Material.REDSTONE_TORCH_ON))
-			{
-				if (data[i])
-				{
-					state.setType(Material.REDSTONE_TORCH_OFF);
-					MaterialData mat = state.getData();
-					if (mat instanceof Torch)
-					{
-						((Torch) mat).setFacingDirection(direction.getBlockFace());
-					}
-				}
-				else
-				{
-					state.setType(Material.AIR);
-				}
-				state.update(true, true);
-			}
-			else
-			{
-				broke = true;
-				break;
-			}
-		}
-		if (broke)
-		{
-			this.counter = 0;
-			player.sendMessage(Torcher.prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, replacing could damage something. Fix the ROM or correct the selection.");
-			return;
-		}
-		counter += amount;
-		player.sendMessage(Torcher.prefix + "Finished writing bits to ROM.");
+		return romSettings.toString();
 	}
-
-	private Location getTorchLocation(int position)
-	{
-		int layer = position % bitsPerLayer;
-
-		int width = layer % bitsPerLine;
-		int length = layer / bitsPerLine;
-		int heigth = position / bitsPerLayer;
-
-		switch (direction.getData()) {
-		case TorchDirection.North:
-			return new Location(min.getWorld(), xs + width * 2, ys - heigth * 4, zs - length * 2 - 1);
-		case TorchDirection.East:
-			return new Location(min.getWorld(), xs + length * 2 + 1, ys - heigth * 4, zs + width * 2);
-		case TorchDirection.South:
-			return new Location(min.getWorld(), xs - width * 2, ys - heigth * 4, zs + length * 2 + 1);
-		}
-		return new Location(min.getWorld(), xs - length * 2 - 1, ys - heigth * 4, zs - width * 2);
-	}
-
-	//Output-Helper
-
-	public int getAddresses()
-	{
-		return (lengthDiff(min, max, direction) + 1) / 2 * ((max.getBlockY() - min.getBlockY()) / 4 + 1);
-	}
-
-	public int getBitwidth()
-	{
-		return bitsPerLine;
-	}
-
-	public String getDirectionString()
+	
+	public String getDirection()
 	{
 		return direction.getDirection();
 	}
