@@ -207,10 +207,7 @@ public class PlayerROM
 				{
 					state.setType(Material.REDSTONE_TORCH_OFF);
 					MaterialData mat = state.getData();
-					if (mat instanceof Torch)
-					{
-						((Torch) mat).setFacingDirection(direction.getBlockFace());
-					}
+					((Torch) mat).setFacingDirection(direction.getBlockFace());
 				}
 				else
 				{
