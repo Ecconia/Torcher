@@ -33,9 +33,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<outputDirectory>/home/ecconia/BukkitKristallServer/plugins</outputDirectory>
-				</configuration>
 			</plugin>
 		</plugins>
 	</build>
