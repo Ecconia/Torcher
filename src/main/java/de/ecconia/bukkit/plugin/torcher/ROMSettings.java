@@ -202,12 +202,64 @@ public class ROMSettings
 		player.sendMessage(Torcher.prefix + "Last paste position has been reset.");
 	}
 	
-	@Override
-	public String toString()
+	public String[] getInfo()
 	{
 		int totalBits = wordSize * size[0] * size[1] * size[2];
 		
-		return "Word size: " + wordSize + " bits, Width: " + size[0] + " word(s), Length: " + size[1] + " word(s), Height: " + size[2] + " word(s), "
-				+ "TOTAL SIZE: " + size[0] * size[1] * size[2] + " word(s) totaling " + totalBits / 8.0 + " bytes (" + totalBits + " bits)";
+		return new String[]{
+				Torcher.prefix + "Word size: " + wordSize + " bits, Width: " + size[0] + " word(s), Length: " + size[1] + " word(s), Height: " + size[2] + " word(s)",
+				Torcher.prefix + "TOTAL SIZE: " + size[0] * size[1] * size[2] + " word(s) totaling " + totalBits / 8.0 + " bytes (" + totalBits + " bits)",
+				Torcher.prefix + "Configuration:",
+				Torcher.prefix + "Width" + (reverse[0] ? "-reversed " : " ") + "priority: " + getPriority(0),
+				Torcher.prefix + "Length" + (reverse[1] ? "-reversed " : " ") + "priority: " + getPriority(1),
+				Torcher.prefix + "Height" + (reverse[2] ? "-reversed " : " ") + "priority: " + getPriority(2),
+				Torcher.prefix + "Data within word flipped: " + flip};
+	}
+	
+	private Integer getPriority(int val)
+	{
+		for(int x = 0; x < order.length; x++)
+		{
+			if(order[x] == val)
+			{
+				return x;
+			}
+		}
+		
+		return null;
+	}
+	
+	public boolean setWordSize(Player player, int wordSize)
+	{
+		int bitsPerWidth = size[0] * this.wordSize;
+		
+		if(bitsPerWidth % wordSize != 0)
+		{
+			player.sendMessage(Torcher.prefix + "Your ROM width is not a multiple of the desired word size.");
+			return false;
+		}
+		
+		size[0] = bitsPerWidth / wordSize;
+		this.wordSize = wordSize;
+		
+		return true;
+	}
+	
+	public void setOrder(int[] order)
+	{
+		if(order.length == 3)
+		{
+			this.order = order;
+		}
+	}
+	
+	public void setReverse(boolean[] reverse)
+	{
+		this.reverse = reverse;
+	}
+	
+	public void setFlip(boolean flip)
+	{
+		this.flip = flip;
 	}
 }

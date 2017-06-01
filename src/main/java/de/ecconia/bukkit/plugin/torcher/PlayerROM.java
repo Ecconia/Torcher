@@ -8,8 +8,6 @@ import org.bukkit.entity.Player;
 public class PlayerROM
 {
 	// Location information
-	private Location min;
-	private Location max;
 	private TorchDirection direction;
 	
 	//ROM Settings
@@ -75,7 +73,7 @@ public class PlayerROM
 			min.setY(max.getBlockY() - blocks);
 		}
 
-		return new PlayerROM(min, max, direction);
+		return new PlayerROM(player, min, max, direction);
 	}
 
 	private static boolean isOddWidth(Location min, Location max, TorchDirection direction)
@@ -105,23 +103,18 @@ public class PlayerROM
 
 	//Factory end/////////////////////////////////////////////////////////////////
 
-	private PlayerROM(Location min, Location max, TorchDirection direction)
+	private PlayerROM(Player player, Location min, Location max, TorchDirection direction)
 	{
-		this.min = min;
-		this.max = max;
 		this.direction = direction;
+		
+		romSettings = ROMSettings.create(player, min, max, 0, direction, new int[]{2, 1, 0}, new boolean[]{false, false, false}, false);
 	}
 	
 	
 	// Command format: 
 	// /torcher setrom ws:#number config:-w-l-h flip:true
 	public boolean config(Player player, String[] para)
-	{
-		int wordSize = 0;
-		int[] romOrder = null;
-		boolean[] reverse = null;
-		boolean flip = false;
-		
+	{	
 		for(int i = 1; i < para.length; i++)
 		{
 			String str = para[i];
@@ -130,7 +123,10 @@ public class PlayerROM
 			{
 				if(NumberUtils.isNumber(str.substring(str.indexOf(':') + 1)))
 				{
-					wordSize = Integer.parseInt(str.substring(str.indexOf(':') + 1));
+					if(!romSettings.setWordSize(player, Integer.parseInt(str.substring(str.indexOf(':') + 1))))
+					{
+						return false;
+					}
 				}
 				else
 				{
@@ -138,10 +134,10 @@ public class PlayerROM
 					return false;
 				}
 			}
-			else if(str.startsWith("config:"))
+			else if(str.startsWith("config:") || str.startsWith("c:"))
 			{
-				romOrder = new int[3];
-				reverse = new boolean[3];
+				int[] romOrder = new int[3];
+				boolean[] reverse = new boolean[3];
 				
 				String s = str.substring(str.indexOf(':') + 1);
 				
@@ -180,6 +176,7 @@ public class PlayerROM
 					else
 					{
 						player.sendMessage(Torcher.prefix + "Illegal character in argument: " + str);
+						player.sendMessage(Torcher.prefix + "Valid characters are 'w', 'l', 'h', and '-'.");
 						return false;
 					}
 					
@@ -201,20 +198,24 @@ public class PlayerROM
 					player.sendMessage(Torcher.prefix + "Illegal argument format: " + str);
 					return false;
 				}
+				
+				romSettings.setOrder(romOrder);
+				romSettings.setReverse(reverse);
 			}
 			else if(str.startsWith("flip:"))
 			{
-				if(str.substring(str.indexOf(':') + 1).equals("true"))
+				if(str.substring(str.indexOf(':') + 1).equalsIgnoreCase("true"))
 				{
-					flip = true;
+					romSettings.setFlip(true);
 				}
-				else if(str.substring(str.indexOf(':') + 1).equals("false"))
+				else if(str.substring(str.indexOf(':') + 1).equalsIgnoreCase("false"))
 				{
-					flip = false;
+					romSettings.setFlip(false);
 				}
 				else
 				{
 					player.sendMessage(Torcher.prefix + "Illegal argument: " + str);
+					player.sendMessage(Torcher.prefix + "Flip must be set to either true or false: \"/torcher config flip:<true,false>\"");
 					return false;
 				}	
 			}
@@ -223,14 +224,6 @@ public class PlayerROM
 				player.sendMessage(Torcher.prefix + "Illegal argument: " + str);
 				return false;
 			}
-		}
-		
-		romSettings = ROMSettings.create(player, min, max, Math.abs(wordSize), direction, romOrder == null ? new int[]{2, 1, 0} : romOrder, 
-				reverse == null ? new boolean[]{false, false, false} : reverse, flip);
-		
-		if(romSettings == null)
-		{
-			return false;
 		}
 		
 		return true;
@@ -246,9 +239,9 @@ public class PlayerROM
 		romSettings.dataInput(player, para);
 	}
 	
-	public String getROMInfo()
+	public String[] getROMInfo()
 	{
-		return romSettings.toString();
+		return romSettings.getInfo();
 	}
 	
 	public String getDirection()
