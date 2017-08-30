@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ecconia.bukkit.plugin.torcher</groupId>
 	<artifactId>Torcher</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<repositories>
 		<repository>
 			<id>bukkit</id>
@@ -18,14 +18,14 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.10.2-R0.1-SNAPSHOT</version>
+			<version>1.12.1-R0.1-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q.worldedit</groupId>
 			<artifactId>worldedit-bukkit</artifactId>
-			<version>6.1.2</version>
+			<version>6.1.5</version>
 		</dependency>
 	</dependencies>
 	<build>
