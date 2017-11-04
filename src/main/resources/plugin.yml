@@ -1,7 +1,10 @@
-name: Torcher
-version: 1.2
-main: de.ecconia.bukkit.plugin.torcher.Torcher
+main: ${groupId}.${artifactId}Plugin
+name: ${artifactId}
+version: ${version}
+
 author: Ecconia
+description: A plugin for autoplacing torches in a ROM.
+
 commands:
     torcher:
         description: Place torches in a ROM automatically.
