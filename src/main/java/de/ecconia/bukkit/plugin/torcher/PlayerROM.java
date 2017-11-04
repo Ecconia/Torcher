@@ -38,13 +38,13 @@ public class PlayerROM
 		//Check width: (must be odd)
 		if (isOddWidth(min, max, direction))
 		{
-			player.sendMessage(Torcher.prefix + "The width of your ROM should be odd.");
+			player.sendMessage(TorcherPlugin.prefix + "The width of your ROM should be odd.");
 			return null;
 		}
 		//Check length: (bigger than 1)
 		if ((direction.isParaX() ? max.getBlockZ() - min.getBlockZ() : max.getBlockX() - min.getBlockX()) < 1)
 		{
-			player.sendMessage(Torcher.prefix + "The length of your ROM should be bigger than 1.");
+			player.sendMessage(TorcherPlugin.prefix + "The length of your ROM should be bigger than 1.");
 			return null;
 		}
 
@@ -53,7 +53,7 @@ public class PlayerROM
 		{
 			if (max.getBlockY() == min.getBlockY())
 			{
-				player.sendMessage(Torcher.prefix + "You should select a ROM, not random redstone.");
+				player.sendMessage(TorcherPlugin.prefix + "You should select a ROM, not random redstone.");
 				return null;
 			}
 			max.setY(max.getBlockY() - 1);
@@ -140,7 +140,7 @@ public class PlayerROM
 	public void resetCounter(Player player)
 	{
 		counter = 0;
-		player.sendMessage(Torcher.prefix + "Last paste position has been resetted.");
+		player.sendMessage(TorcherPlugin.prefix + "Last paste position has been resetted.");
 	}
 
 	public void dataInput(Player player, String para)
@@ -174,7 +174,7 @@ public class PlayerROM
 			}
 		}
 		int bitsLeft = (para.length() * 15) - counter;
-		player.sendMessage(Torcher.prefix + "Read " + counter + " bits. " + (bitsLeft > 14 ? "You send more data then the ROM can hold. " + bitsLeft + " bits are left." : ""));
+		player.sendMessage(TorcherPlugin.prefix + "Read " + counter + " bits. " + (bitsLeft > 14 ? "You send more data then the ROM can hold. " + bitsLeft + " bits are left." : ""));
 		//	String code = "Code: ";
 		//	or (int offset = 0; offset < counter; offset += 4)
 		//	{
@@ -224,11 +224,11 @@ public class PlayerROM
 		if (broke)
 		{
 			this.counter = 0;
-			player.sendMessage(Torcher.prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, replacing could damage something. Fix the ROM or correct the selection.");
+			player.sendMessage(TorcherPlugin.prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, replacing could damage something. Fix the ROM or correct the selection.");
 			return;
 		}
 		counter += amount;
-		player.sendMessage(Torcher.prefix + "Finished writing bits to ROM.");
+		player.sendMessage(TorcherPlugin.prefix + "Finished writing bits to ROM.");
 	}
 
 	private Location getTorchLocation(int position)
