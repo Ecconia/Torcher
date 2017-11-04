@@ -11,7 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
-public class Torcher extends JavaPlugin
+public class TorcherPlugin extends JavaPlugin
 {
 	private HashMap<UUID, PlayerROM> roms;
 	protected static final String prefix = ChatColor.WHITE + "[" + ChatColor.GOLD + "Torcher" + ChatColor.WHITE + "]" + ChatColor.GRAY + " ";

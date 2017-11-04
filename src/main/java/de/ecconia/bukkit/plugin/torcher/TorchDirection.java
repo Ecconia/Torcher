@@ -41,7 +41,7 @@ public class TorchDirection
 		}
 		else
 		{
-			player.sendMessage(Torcher.prefix + ChatColor.RED + "Something went wrong, no proper angle: " + ChatColor.WHITE + player.getLocation().getYaw());
+			player.sendMessage(TorcherPlugin.prefix + ChatColor.RED + "Something went wrong, no proper angle: " + ChatColor.WHITE + player.getLocation().getYaw());
 			return null;
 		}
 	}
