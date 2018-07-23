@@ -3,15 +3,20 @@ package de.ecconia.bukkit.plugin.torcher;
 import java.util.HashMap;
 import java.util.UUID;
 
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
-public class TorcherPlugin extends JavaPlugin
+public class TorcherPlugin extends JavaPlugin implements Listener
 {
 	private HashMap<UUID, PlayerROM> roms;
 	protected static final String prefix = ChatColor.WHITE + "[" + ChatColor.GOLD + "Torcher" + ChatColor.WHITE + "]" + ChatColor.GRAY + " ";
@@ -21,6 +26,8 @@ public class TorcherPlugin extends JavaPlugin
 	{
 		roms = new HashMap<UUID, PlayerROM>();
 		saveDefaultConfig();
+		
+		getServer().getPluginManager().registerEvents(this, this);
 	}
 	
 	@Override
@@ -28,6 +35,35 @@ public class TorcherPlugin extends JavaPlugin
 	{
 		roms.clear();
 		roms = null;
+	}
+
+	@EventHandler(priority=EventPriority.NORMAL)
+	public void onAllCommands(PlayerCommandPreprocessEvent event)
+	{
+		if(StringUtils.startsWithIgnoreCase(event.getMessage(), "/torcher "))
+		{
+			String commandContent = event.getMessage().substring("/torcher ".length()).trim();
+			int firstSpace = commandContent.indexOf(' ');
+			if(firstSpace >= 0)
+			{
+				String subcommand = commandContent.substring(0, firstSpace);
+				if(StringHelper.partOf(subcommand, "binary"))
+				{
+					event.setCancelled(true);
+					
+					String content = commandContent.substring(firstSpace+1).trim();
+					Player player = event.getPlayer();
+					if(content.indexOf(' ') >= 0)
+					{
+						player.sendMessage(prefix + "Your data is broken, check that it doesn't contain spaces.");
+					}
+					else
+					{
+						roms.get(player.getUniqueId()).dataInput(player, content);
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -96,18 +132,18 @@ public class TorcherPlugin extends JavaPlugin
 					{
 						roms.get(player.getUniqueId()).resetCounter(player);
 					}
-					else if (StringHelper.partOf(args[0], "sendbinary", "senddata", "data", "binary"))
+					else if (StringHelper.partOf(args[0], "binary"))
 					{
 						if (args.length == 1)
 						{
-							player.sendMessage(prefix + "Syntax: /torcher <sendbinary/senddata/data/binary> <data>");
+							player.sendMessage(prefix + "Syntax: /torcher <binary> <data>");
 							return true;
 						}
-						if (args.length > 2)
-						{
-							player.sendMessage(prefix + "Warning, Your data could be broken, check that it doesn't contain spaces.");
-						}
-						roms.get(player.getUniqueId()).dataInput(player, args[1]);
+//						if (args.length > 2)
+//						{
+//							player.sendMessage(prefix + "Warning, Your data could be broken, check that it doesn't contain spaces.");
+//						}
+//						roms.get(player.getUniqueId()).dataInput(player, args[1]);
 					}
 					else
 					{
@@ -144,7 +180,7 @@ public class TorcherPlugin extends JavaPlugin
 				ChatColor.WHITE + "-" + ChatColor.GOLD + "client/files/tools" + ChatColor.GRAY + " - " + "Here you'll find tools that compress the data for you.",
 				ChatColor.WHITE + "-" + ChatColor.GOLD + "rom/setrom/definerom <look direction>" + ChatColor.GRAY + " - " + "Select a standard ROM with WorldEdit, look in the same direction as the torches and use this command.", 
 				ChatColor.WHITE + "-" + ChatColor.GOLD + "resetcounter/newbinary " + ChatColor.GRAY + " - " + "Resets the counter, if you want to write from address 0 again.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "sendbinary/senddata/data/binary <data>" + ChatColor.GRAY + " - " + "Send the compressed data using this command.",
+				ChatColor.WHITE + "-" + ChatColor.GOLD + "binary <data>" + ChatColor.GRAY + " - " + "Send the compressed data using this command.",
 				ChatColor.WHITE + "-" + ChatColor.GOLD + "Smaller Commands" + ChatColor.GRAY + " - " + "You can leave characters away in a command: \"/torcher rom\" = \"/torcher r\", but be careful with \"/torcher data\", \"/torcher d\" is \"/torcher definerom\"."});
 	}
 	
