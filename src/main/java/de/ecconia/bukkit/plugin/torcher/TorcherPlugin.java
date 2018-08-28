@@ -1,6 +1,8 @@
 package de.ecconia.bukkit.plugin.torcher;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
@@ -172,36 +174,53 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	
 	private static void printSimpleHelp(Player player)
 	{
-		player.sendMessage(new String[] { 
-				ChatColor.GOLD + "Torcher " + ChatColor.WHITE + "Command " + ChatColor.GRAY + "Overview:", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "help", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "about", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "client",
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "definerom <look direction>", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "resetcounter", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "sendbinary <data>"});
+		sendFeedback(player, "Command", "Overview",
+			"help", "",
+			"about", "",
+			"client", "",
+			"definerom <look direction>", "",
+			"resetcounter", "",
+			"sendbinary <data>", ""
+		);
 	}
 
 	private static void printHelp(Player player)
 	{
-		player.sendMessage(new String[] { 
-				ChatColor.GOLD + "Torcher " + ChatColor.WHITE + "Command " + ChatColor.GRAY + "Help:", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "about/info" + ChatColor.GRAY + " - " + "Information about how this plugin works.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "client/files/tools" + ChatColor.GRAY + " - " + "Here you'll find tools that compress the data for you.",
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "rom/setrom/definerom <look direction>" + ChatColor.GRAY + " - " + "Select a standard ROM with WorldEdit, look in the same direction as the torches and use this command.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "resetcounter/newbinary " + ChatColor.GRAY + " - " + "Resets the counter, if you want to write from address 0 again.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "binary <data>" + ChatColor.GRAY + " - " + "Send the compressed data using this command.",
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "Smaller Commands" + ChatColor.GRAY + " - " + "You can leave characters away in a command: \"/torcher rom\" = \"/torcher r\", but be careful with \"/torcher data\", \"/torcher d\" is \"/torcher definerom\"."});
+		sendFeedback(player, "Command", "Help",
+			"about/info", "Information about how this plugin works.",
+			"client/files/tools", "Here you'll find tools that compress the data for you.",
+			"rom/setrom/definerom <look direction>", "Select a standard ROM with WorldEdit, look in the same direction as the torches and use this command.",
+			"resetcounter/newbinary", "Resets the counter, if you want to write from address 0 again.",
+			"binary <data>", "Send the compressed data using this command.",
+			"Smaller Commands", "You can leave characters away in a command: \"/torcher rom\" = \"/torcher r\", but be careful with \"/torcher data\", \"/torcher d\" is \"/torcher definerom\"."
+		);
 	}
 	
 	private static void printAbout(Player player)
 	{
-		player.sendMessage(new String[] { 
-				ChatColor.GOLD + "Torcher " + ChatColor.WHITE + "About " + ChatColor.GRAY + "Page:", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "ROM's" + ChatColor.GRAY + " - " + "ROM's are the base of all standard computers. You have to select the ROM you want to flash with binary data. The direction the torches are facing is the direction of the ROM. Torches have [ ]-o --this-> direction.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "Data" + ChatColor.GRAY + " - " + "To send as many bits as possible to the ROM each letter in the send command sends 15 Bits at once (not less). It's possible to send 89 letters with the command, that makes 1335 bits per command.", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "Compression" + ChatColor.GRAY + " - " + "The order of the bits is defined and can't be changed. If you look in the torch direction the first bit is always left. The first addresses are in the top layer of your ROM. The first address is at the front (torchdirection).", 
-				ChatColor.WHITE + "-" + ChatColor.GOLD + "Author" + ChatColor.GRAY + " - " + "This Plugin was written by the player Ecconia, since he totally sucks at placing torches in ROM's. It should get the input by an automated typer though chat."
-});
+		sendFeedback(player, "About", "Page",
+			"ROM's", "ROM's are the base of all standard computers. You have to select the ROM you want to flash with binary data. The direction the torches are facing is the direction of the ROM. Torches have [ ]-o --this-> direction.",
+			"Data", "To send as many bits as possible to the ROM each letter in the send command sends 15 Bits at once (not less). It's possible to send 89 letters with the command, that makes 1335 bits per command.",
+			"Compression", "The order of the bits is defined and can't be changed. If you look in the torch direction the first bit is always left. The first addresses are in the top layer of your ROM. The first address is at the front (torchdirection).",
+			"Author", "This Plugin was written by the player Ecconia, since he totally sucks at placing torches in ROM's. It should get the input by an automated typer though chat."
+		);
+	}
+	
+	private static void sendFeedback(Player player, String title1, String title2, String...subLines)
+	{
+		List<String> lines = new ArrayList<>();
+		lines.add(ChatColor.GOLD + "Torcher " + ChatColor.WHITE + title1 + ChatColor.GRAY + title2 + ":");
+		for(int i = 0; i < subLines.length / 2; i += 2)
+		{
+			String details = subLines[i+1];
+			if(!details.isEmpty())
+			{
+				details = ChatColor.GRAY + " - " + details;
+			}
+			
+			lines.add(ChatColor.WHITE + "-" + ChatColor.GOLD + subLines[i] + details);
+		}
+		
+		player.sendMessage(lines.toArray(new String[lines.size()]));
 	}
 }
