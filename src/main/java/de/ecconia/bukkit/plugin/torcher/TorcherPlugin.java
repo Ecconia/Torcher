@@ -104,10 +104,10 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			{
 				printAbout(player);
 			}
-			else if (StringHelper.partOf(args[0], "client"))
+			else if (StringHelper.partOf(args[0], "tools"))
 			{
 				reloadConfig();
-				String client = getConfig().getString("client");
+				String client = getConfig().getString("tools");
 				if(client == null)
 				{
 					player.sendMessage(prefix + "There is no link to tools provided.");
@@ -156,7 +156,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 		sendFeedback(player, "Subcommands", "List",
 			"help", "",
 			"about", "",
-			"client", "",
+			"tools", "",
 			"define [head direction]", "",
 			"reset", "",
 			"binary <data>", ""
@@ -167,7 +167,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	{
 		sendFeedback(player, "Command", "Help",
 			"about", "Information about how this plugin works.",
-			"client", "Here you'll find tools that compress the data for you.",
+			"tools", "Here you'll find tools that compress the data for you.",
 			"define [head direction]", "Select a normal torch ROM with WorldEdit, look in the same direction as the torches and use this command.",
 			"reset", "Resets the counter, if you want to write from address 0 again.",
 			"binary <data>", "Send the compressed data using this command.",
