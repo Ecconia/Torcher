@@ -1,4 +1,4 @@
-package de.ecconia.bukkit.plugin.torcher;
+package de.ecconia.bukkit.plugin.torcher.helpers;
 
 public class StringHelper
 {

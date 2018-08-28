@@ -16,6 +16,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
+import de.ecconia.bukkit.plugin.torcher.helpers.StringHelper;
+import de.ecconia.bukkit.plugin.torcher.helpers.WorldEditHelper;
+
 public class TorcherPlugin extends JavaPlugin implements Listener
 {
 	private HashMap<UUID, PlayerROM> roms;
