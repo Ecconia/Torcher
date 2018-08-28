@@ -29,7 +29,7 @@ public class PlayerROM
 	
 	//Factory begin///////////////////////////////////////////////////////////////
 	
-	public static PlayerROM create(Player player, Location min, Location max)
+	public static PlayerROM create(Player player, Location min, Location max, String[] extraArgs)
 	{
 		TorchDirection direction = TorchDirection.create(player);
 		if(direction == null)
