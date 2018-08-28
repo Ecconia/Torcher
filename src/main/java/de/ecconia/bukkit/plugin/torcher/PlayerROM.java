@@ -1,11 +1,18 @@
 package de.ecconia.bukkit.plugin.torcher;
 
+import static de.ecconia.bukkit.plugin.torcher.TorcherPlugin.prefix;
+import static de.ecconia.bukkit.plugin.torcher.placement.Direction.BACK;
+import static de.ecconia.bukkit.plugin.torcher.placement.Direction.DOWN;
+import static de.ecconia.bukkit.plugin.torcher.placement.Direction.LEFT;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.RedstoneWallTorch;
 import org.bukkit.entity.Player;
+
+import de.ecconia.bukkit.plugin.torcher.placement.Direction;
 
 public class PlayerROM
 {
@@ -34,20 +41,21 @@ public class PlayerROM
 		TorchDirection direction = TorchDirection.create(player);
 		if(direction == null)
 		{
+			player.sendMessage(prefix + "Could not determine your player rotation.");
 			return null;
 		}
 		
 		//Check width: (must be odd)
 		if(isOddWidth(min, max, direction))
 		{
-			player.sendMessage(TorcherPlugin.prefix + "The width of your ROM should be odd.");
+			player.sendMessage(prefix + "The width of your ROM should be odd.");
 			return null;
 		}
 		
 		//Check length: (bigger than 1)
 		if((direction.isParaX() ? max.getBlockZ() - min.getBlockZ() : max.getBlockX() - min.getBlockX()) < 1)
 		{
-			player.sendMessage(TorcherPlugin.prefix + "The length of your ROM should be bigger than 1.");
+			player.sendMessage(prefix + "The length of your ROM should be bigger than 1.");
 			return null;
 		}
 		
@@ -56,7 +64,7 @@ public class PlayerROM
 		{
 			if(max.getBlockY() == min.getBlockY())
 			{
-				player.sendMessage(TorcherPlugin.prefix + "You should select a ROM, not random redstone.");
+				player.sendMessage(prefix + "You should select a ROM, not random redstone.");
 				return null;
 			}
 			
@@ -93,7 +101,61 @@ public class PlayerROM
 			min.setY(max.getBlockY() - blocks);
 		}
 		
-		return new PlayerROM(min, max, direction);
+		//Invlaid arg count:
+		if(extraArgs.length != 0 && extraArgs.length != 3)
+		{
+			player.sendMessage(prefix + "Usage: \"/torcher define\"");
+			//TODO: Help for the flipping options.
+		}
+		
+		Direction first = LEFT;
+		Direction second = BACK;
+		Direction third = DOWN;
+		
+		//Extra options:
+		if(extraArgs.length == 3)
+		{
+			for(String arg : extraArgs)
+			{
+				if(arg.length() != 1)
+				{
+					player.sendMessage(prefix + "Only modifiers with one character are allowed.");
+					return null;
+				}
+			}
+			
+			first = Direction.lookup(extraArgs[0].charAt(0));
+			second = Direction.lookup(extraArgs[0].charAt(0));
+			third = Direction.lookup(extraArgs[0].charAt(0));
+			
+			if(first == null)
+			{
+				player.sendMessage(prefix + "Cannot parse " + extraArgs[0] + " to a direction, allowed: l r u d b f");
+				return null;
+			}
+			
+			if(second == null)
+			{
+				player.sendMessage(prefix + "Cannot parse " + extraArgs[1] + " to a direction, allowed: l r u d b f");
+				return null;
+			}
+			
+			if(third == null)
+			{
+				player.sendMessage(prefix + "Cannot parse " + extraArgs[2] + " to a direction, allowed: l r u d b f");
+				return null;
+			}
+			
+			if(Direction.checkForSameAxis(first, second, third))
+			{
+				player.sendMessage(prefix + "Cannot parse " + extraArgs[2] + " to a direction, allowed: l r u d b f");
+				return null;
+			}
+			
+			//All good here
+		}
+		
+		return new PlayerROM(min, max, direction, first, second, third);
 	}
 	
 	private static boolean isOddWidth(Location min, Location max, TorchDirection direction)
@@ -123,7 +185,7 @@ public class PlayerROM
 	
 	//Factory end/////////////////////////////////////////////////////////////////
 	
-	private PlayerROM(Location min, Location max, TorchDirection direction)
+	private PlayerROM(Location min, Location max, TorchDirection direction, Direction first, Direction second, Direction third)
 	{
 		this.min = min;
 		this.max = max;
