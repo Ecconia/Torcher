@@ -3,7 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.ecconia.bukkit.plugin.torcher</groupId>
 	<artifactId>Torcher</artifactId>
-	<version>1.4</version>
+	<version>1.5</version>
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	
 	<repositories>
 		<repository>
 			<id>bukkit</id>
@@ -14,6 +19,7 @@
 			<url>http://maven.sk89q.com/artifactory/repo</url>
 		</repository>
 	</repositories>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
@@ -26,8 +32,10 @@
 			<groupId>com.sk89q.worldedit</groupId>
 			<artifactId>worldedit-bukkit</artifactId>
 			<version>6.1.5</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+	
 	<build>
 		<resources>
 			<resource>
@@ -35,6 +43,7 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

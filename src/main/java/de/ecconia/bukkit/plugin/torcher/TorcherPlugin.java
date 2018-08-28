@@ -59,7 +59,14 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					}
 					else
 					{
-						roms.get(player.getUniqueId()).dataInput(player, content);
+						if (roms.containsKey(player.getUniqueId()))
+						{
+							roms.get(player.getUniqueId()).dataInput(player, content);
+						}
+						else
+						{
+							player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher rom\".");
+						}
 					}
 				}
 			}
