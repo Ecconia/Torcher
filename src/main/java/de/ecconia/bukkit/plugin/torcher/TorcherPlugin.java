@@ -25,7 +25,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 {
 	private HashMap<UUID, PlayerROM> roms;
 	protected static final String prefix = ChatColor.WHITE + "[" + ChatColor.GOLD + "Torcher" + ChatColor.WHITE + "]" + ChatColor.GRAY + " ";
-
+	
 	@Override
 	public void onEnable()
 	{
@@ -41,7 +41,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 		roms.clear();
 		roms = null;
 	}
-
+	
 	@EventHandler(priority=EventPriority.NORMAL)
 	public void onAllCommands(PlayerCommandPreprocessEvent event)
 	{
@@ -77,7 +77,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			}
 		}
 	}
-
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
@@ -94,10 +94,10 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			sender.sendMessage(prefix + "This command does not work from console.");
 			return true;
 		}
-
+		
 		//Interface
 		Player player = (Player) sender;
-
+		
 		if (args.length == 0)
 		{
 			printSimpleHelp(player);
@@ -144,19 +144,6 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					{
 						roms.get(player.getUniqueId()).resetCounter(player);
 					}
-					else if (StringHelper.partOf(args[0], "binary"))
-					{
-						if (args.length == 1)
-						{
-							player.sendMessage(prefix + "Syntax: /torcher <binary> <data>");
-							return true;
-						}
-//						if (args.length > 2)
-//						{
-//							player.sendMessage(prefix + "Warning, Your data could be broken, check that it doesn't contain spaces.");
-//						}
-//						roms.get(player.getUniqueId()).dataInput(player, args[1]);
-					}
 					else
 					{
 						printSimpleHelp(player);
@@ -169,7 +156,6 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			}
 		}
 		return true;
-
 	}
 	
 	private static void printSimpleHelp(Player player)
@@ -183,7 +169,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			"sendbinary <data>", ""
 		);
 	}
-
+	
 	private static void printHelp(Player player)
 	{
 		sendFeedback(player, "Command", "Help",
