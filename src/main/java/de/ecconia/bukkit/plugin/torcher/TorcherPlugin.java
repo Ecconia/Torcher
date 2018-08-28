@@ -70,7 +70,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 						}
 						else
 						{
-							player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher rom\".");
+							player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher define\".");
 						}
 					}
 				}
@@ -100,11 +100,11 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			{
 				printHelp(player);
 			}
-			else if (StringHelper.partOf(args[0], "about", "info"))
+			else if (StringHelper.partOf(args[0], "about"))
 			{
 				printAbout(player);
 			}
-			else if (StringHelper.partOf(args[0], "client", "files", "tools"))
+			else if (StringHelper.partOf(args[0], "client"))
 			{
 				reloadConfig();
 				String client = getConfig().getString("client");
@@ -117,7 +117,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					player.sendMessage(prefix + "Link to tools: " + client);
 				}
 			}
-			else if (StringHelper.partOf(args[0], "rom", "setrom", "definerom"))
+			else if (StringHelper.partOf(args[0], "define"))
 			{
 				Selection s = WorldEditHelper.getSelection(player, prefix);
 				if (s == null) { return true; }
@@ -132,7 +132,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			{
 				if (roms.containsKey(player.getUniqueId()))
 				{
-					if (StringHelper.partOf(args[0], "resetcounter", "newbinary"))
+					if (StringHelper.partOf(args[0], "reset"))
 					{
 						roms.get(player.getUniqueId()).resetCounter(player);
 					}
@@ -143,34 +143,35 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 				}
 				else
 				{
-					player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher rom\".");
+					player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher define\".");
 				}
 			}
 		}
+		
 		return true;
 	}
 	
 	private static void printSimpleHelp(Player player)
 	{
-		sendFeedback(player, "Command", "Overview",
+		sendFeedback(player, "Subcommands", "List",
 			"help", "",
 			"about", "",
 			"client", "",
-			"definerom <look direction>", "",
-			"resetcounter", "",
-			"sendbinary <data>", ""
+			"define [head direction]", "",
+			"reset", "",
+			"binary <data>", ""
 		);
 	}
 	
 	private static void printHelp(Player player)
 	{
 		sendFeedback(player, "Command", "Help",
-			"about/info", "Information about how this plugin works.",
-			"client/files/tools", "Here you'll find tools that compress the data for you.",
-			"rom/setrom/definerom <look direction>", "Select a standard ROM with WorldEdit, look in the same direction as the torches and use this command.",
-			"resetcounter/newbinary", "Resets the counter, if you want to write from address 0 again.",
+			"about", "Information about how this plugin works.",
+			"client", "Here you'll find tools that compress the data for you.",
+			"define [head direction]", "Select a normal torch ROM with WorldEdit, look in the same direction as the torches and use this command.",
+			"reset", "Resets the counter, if you want to write from address 0 again.",
 			"binary <data>", "Send the compressed data using this command.",
-			"Smaller Commands", "You can leave characters away in a command: \"/torcher rom\" = \"/torcher r\", but be careful with \"/torcher data\", \"/torcher d\" is \"/torcher definerom\"."
+			"Smaller Commands", "You can leave characters away in a command: \"/torcher define\" = \"/torcher d\"."
 		);
 	}
 	
