@@ -8,3 +8,4 @@ description: A plugin for autoplacing torches in a ROM.
 commands:
     torcher:
         description: Place torches in a ROM automatically.
+        permission: torcher

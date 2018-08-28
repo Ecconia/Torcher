@@ -52,7 +52,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			if(firstSpace >= 0)
 			{
 				String subcommand = commandContent.substring(0, firstSpace);
-				if(StringHelper.partOf(subcommand, "binary"))
+				if(StringHelper.partOf(subcommand, "binary") && event.getPlayer().hasPermission("torcher"))
 				{
 					event.setCancelled(true);
 					
@@ -81,15 +81,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
-		if (sender instanceof Player)
-		{
-			if (!((Player) sender).hasPermission("ecconia.torcher"))
-			{
-				sender.sendMessage(prefix + "You don't have permission to use this command.");
-				return true;
-			}
-		}
-		else
+		if (!(sender instanceof Player))
 		{
 			sender.sendMessage(prefix + "This command does not work from console.");
 			return true;
