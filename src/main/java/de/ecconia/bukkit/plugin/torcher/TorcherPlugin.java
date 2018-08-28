@@ -49,15 +49,18 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 		{
 			String commandContent = event.getMessage().substring("/torcher ".length()).trim();
 			int firstSpace = commandContent.indexOf(' ');
+			
 			if(firstSpace >= 0)
 			{
 				String subcommand = commandContent.substring(0, firstSpace);
+				
 				if(StringHelper.partOf(subcommand, "binary") && event.getPlayer().hasPermission("torcher"))
 				{
 					event.setCancelled(true);
 					
 					String content = commandContent.substring(firstSpace+1).trim();
 					Player player = event.getPlayer();
+					
 					if(content.indexOf(' ') >= 0)
 					{
 						player.sendMessage(prefix + "Your data is broken, check that it doesn't contain spaces.");
@@ -81,7 +84,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
 	{
-		if (!(sender instanceof Player))
+		if(!(sender instanceof Player))
 		{
 			sender.sendMessage(prefix + "This command does not work from console.");
 			return true;
@@ -90,24 +93,25 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 		//Interface
 		Player player = (Player) sender;
 		
-		if (args.length == 0)
+		if(args.length == 0)
 		{
 			printSimpleHelp(player);
 		}
 		else
 		{
-			if (StringHelper.partOf(args[0], "?", "help"))
+			if(StringHelper.partOf(args[0], "?", "help"))
 			{
 				printHelp(player);
 			}
-			else if (StringHelper.partOf(args[0], "about"))
+			else if(StringHelper.partOf(args[0], "about"))
 			{
 				printAbout(player);
 			}
-			else if (StringHelper.partOf(args[0], "tools"))
+			else if(StringHelper.partOf(args[0], "tools"))
 			{
 				reloadConfig();
 				String client = getConfig().getString("tools");
+				
 				if(client == null)
 				{
 					player.sendMessage(prefix + "There is no link to tools provided.");
@@ -117,12 +121,16 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					player.sendMessage(prefix + "Link to tools: " + client);
 				}
 			}
-			else if (StringHelper.partOf(args[0], "define"))
+			else if(StringHelper.partOf(args[0], "define"))
 			{
 				Selection s = WorldEditHelper.getSelection(player, prefix);
-				if (s == null) { return true; }
+				if(s == null)
+				{
+					return true;
+				}
+				
 				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint());
-				if (rom != null)
+				if(rom != null)
 				{
 					roms.put(player.getUniqueId(), rom);
 					player.sendMessage(prefix + "ROM with " + rom.getAddresses() + " addresses of each " + rom.getBitwidth() + " bits defined. " + " Direction: " + rom.getDirectionString());
@@ -130,9 +138,9 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			}
 			else
 			{
-				if (roms.containsKey(player.getUniqueId()))
+				if(roms.containsKey(player.getUniqueId()))
 				{
-					if (StringHelper.partOf(args[0], "reset"))
+					if(StringHelper.partOf(args[0], "reset"))
 					{
 						roms.get(player.getUniqueId()).resetCounter(player);
 					}
@@ -189,6 +197,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	{
 		List<String> lines = new ArrayList<>();
 		lines.add(ChatColor.GOLD + "Torcher " + ChatColor.WHITE + title1 + ChatColor.GRAY + title2 + ":");
+		
 		for(int i = 0; i < subLines.length / 2; i += 2)
 		{
 			String details = subLines[i+1];
