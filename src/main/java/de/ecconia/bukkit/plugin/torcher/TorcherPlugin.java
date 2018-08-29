@@ -148,7 +148,8 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 				{
 					if(StringHelper.partOf(args[0], "reset"))
 					{
-						roms.get(player.getUniqueId()).resetCounter(player);
+						roms.get(player.getUniqueId()).resetCounter();
+						player.sendMessage(TorcherPlugin.prefix + "Last paste position has been resetted.");
 					}
 					else
 					{

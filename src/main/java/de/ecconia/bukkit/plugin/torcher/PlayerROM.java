@@ -203,10 +203,9 @@ public class PlayerROM
 		zs = direction.isMaxZ() ? max.getBlockZ() : min.getBlockZ();
 	}
 	
-	public void resetCounter(Player player)
+	public void resetCounter()
 	{
 		counter = 0;
-		player.sendMessage(TorcherPlugin.prefix + "Last paste position has been resetted.");
 	}
 	
 	public void dataInput(Player player, String para)
