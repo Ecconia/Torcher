@@ -16,7 +16,6 @@ public class TriDirections<T>
 	Direction<T> yDir;
 	Direction<T> zDir;
 	
-	@SuppressWarnings("incomplete-switch")
 	public TriDirections(BlockFace direction, char f, char s, char t)
 	{
 		//Create objects for linking the same data.
@@ -42,8 +41,9 @@ public class TriDirections<T>
 		case WEST:
 			xDir = depth;
 			zDir = width;
-			
 			break;
+		default:
+			throw new InternalError("Received a BlockFace which should never happen to be here: " + direction.toString());
 		}
 		
 		//Determine, if an axis is incrementing or decrementing.
