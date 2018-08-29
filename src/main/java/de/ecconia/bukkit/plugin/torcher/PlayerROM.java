@@ -1,9 +1,6 @@
 package de.ecconia.bukkit.plugin.torcher;
 
 import static de.ecconia.bukkit.plugin.torcher.TorcherPlugin.prefix;
-import static de.ecconia.bukkit.plugin.torcher.placement.Direction.BACK;
-import static de.ecconia.bukkit.plugin.torcher.placement.Direction.DOWN;
-import static de.ecconia.bukkit.plugin.torcher.placement.Direction.LEFT;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -12,7 +9,7 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.RedstoneWallTorch;
 import org.bukkit.entity.Player;
 
-import de.ecconia.bukkit.plugin.torcher.placement.Direction;
+import de.ecconia.bukkit.plugin.torcher.helpers.StringHelper;
 
 public class PlayerROM
 {
@@ -108,54 +105,69 @@ public class PlayerROM
 			//TODO: Help for the flipping options.
 		}
 		
-		Direction first = LEFT;
-		Direction second = BACK;
-		Direction third = DOWN;
+		char vectors[] = {'l', 'b', 'd'};
 		
 		//Extra options:
+		//TODO: For now this is 3, later guessing should be implemented.
 		if(extraArgs.length == 3)
 		{
-			for(String arg : extraArgs)
+			boolean hadW = false;
+			boolean hadH = false;
+			boolean hadD = false;
+			
+			for(int i = 0; i < extraArgs.length; i++)
 			{
-				if(arg.length() != 1)
+				String argument = extraArgs[i];
+				if(StringHelper.partOf(argument, "right", "left", "up", "down", "back", "forward"))
 				{
-					player.sendMessage(prefix + "Only modifiers with one character are allowed.");
+					char directionChar = argument.charAt(0);
+					if((int)directionChar < 97)
+					{
+						directionChar += 32;
+					}
+					
+					switch(directionChar)
+					{
+					case 'r':
+					case 'l':
+						if(hadW)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the width of the ROM (multiple left/right).");
+							return null;
+						}
+						hadW = true;
+						break;
+					case 'f':
+					case 'b':
+						if(hadD)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the depth of the ROM (multiple back/forward).");
+							return null;
+						}
+						hadD = true;
+						break;
+					case 'u':
+					case 'd':
+						if(hadH)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the hight of the ROM (multiple up/down).");
+							return null;
+						}
+						hadH = true;
+						break;
+					}
+					
+					vectors[i] = directionChar;
+				}
+				else
+				{
+					player.sendMessage(prefix + "Cannot parse argument \"" + argument + "\" to: right, left, up, down, back, forward.");
 					return null;
 				}
 			}
-			
-			first = Direction.lookup(extraArgs[0].charAt(0));
-			second = Direction.lookup(extraArgs[0].charAt(0));
-			third = Direction.lookup(extraArgs[0].charAt(0));
-			
-			if(first == null)
-			{
-				player.sendMessage(prefix + "Cannot parse " + extraArgs[0] + " to a direction, allowed: l r u d b f");
-				return null;
-			}
-			
-			if(second == null)
-			{
-				player.sendMessage(prefix + "Cannot parse " + extraArgs[1] + " to a direction, allowed: l r u d b f");
-				return null;
-			}
-			
-			if(third == null)
-			{
-				player.sendMessage(prefix + "Cannot parse " + extraArgs[2] + " to a direction, allowed: l r u d b f");
-				return null;
-			}
-			
-			if(Direction.checkForSameAxis(first, second, third))
-			{
-				player.sendMessage(prefix + "Cannot parse " + extraArgs[2] + " to a direction, allowed: l r u d b f");
-				return null;
-			}
-			
-			//All good here
 		}
 		
-		return new PlayerROM(min, max, direction, first, second, third);
+		return new PlayerROM(min, max, direction, vectors[0], vectors[1], vectors[2]);
 	}
 	
 	private static boolean isOddWidth(Location min, Location max, TorchDirection direction)
@@ -185,7 +197,7 @@ public class PlayerROM
 	
 	//Factory end/////////////////////////////////////////////////////////////////
 	
-	private PlayerROM(Location min, Location max, TorchDirection direction, Direction first, Direction second, Direction third)
+	private PlayerROM(Location min, Location max, TorchDirection direction, char first, char second, char third)
 	{
 		this.min = min;
 		this.max = max;
