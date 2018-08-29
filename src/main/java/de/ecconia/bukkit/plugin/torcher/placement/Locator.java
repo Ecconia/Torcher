@@ -40,6 +40,12 @@ public class Locator
 	
 	public Location getNextLocation()
 	{
+		//Check if ROM is full.
+		if(oBi.wasLastOverflow())
+		{
+			return null;
+		}
+		
 		//Get current Location:
 		Location loc = new Location(world, xBi.getValue(), yBi.getValue(), zBi.getValue());
 		
@@ -51,10 +57,6 @@ public class Locator
 			if(mBi.wasLastOverflow())
 			{
 				oBi.next();
-				if(oBi.wasLastOverflow())
-				{
-					return null;
-				}
 			}
 		}
 		
