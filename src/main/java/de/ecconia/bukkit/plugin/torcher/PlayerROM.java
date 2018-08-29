@@ -232,7 +232,7 @@ public class PlayerROM
 			if(loc == null)
 			{
 				resetCounter();
-				player.sendMessage(prefix + "Abort writing: You send more data then the ROM can hold.");
+				player.sendMessage(prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": ROM is full, cannot write more bits.");
 				player.sendMessage(prefix + "Wrote " + bitsWritten + "/" + bits.length + ".");
 				return;
 			}
