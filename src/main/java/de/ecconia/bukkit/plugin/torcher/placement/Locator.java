@@ -23,9 +23,9 @@ public class Locator
 		TriDirections<BiLoopTwo> vectors = new TriDirections<>(torchDir, first, second, third);
 		
 		//Create the loops for each axis
-		xBi = new BiLoopTwo(min.getBlockX(), max.getBlockX(), vectors.isXIncreasing());
-		yBi = new BiLoopTwo(min.getBlockY(), max.getBlockY(), vectors.isYIncreasing());
-		zBi = new BiLoopTwo(min.getBlockZ(), max.getBlockZ(), vectors.isZIncreasing());
+		xBi = new BiLoopTwo(min.getBlockX(), max.getBlockX(), vectors.isXIncreasing(), 2);
+		yBi = new BiLoopTwo(min.getBlockY(), max.getBlockY(), vectors.isYIncreasing(), 4);
+		zBi = new BiLoopTwo(min.getBlockZ(), max.getBlockZ(), vectors.isZIncreasing(), 2);
 		
 		//Throw them to the magic helper
 		vectors.setXObject(xBi);
@@ -74,37 +74,32 @@ public class Locator
 		private final int max;
 		private final boolean inc;
 		
+		private final int amount;
+		private final int counterReset;
+		
 		private int counter;
 		private boolean wasoverflow;
 		
-		public BiLoopTwo(int min, int max, boolean inc)
+		public BiLoopTwo(int min, int max, boolean inc, int amount)
 		{
 			this.min = min;
 			this.max = max;
 			this.inc = inc;
 			
+			this.amount = inc ? amount : -amount;
+			
 			counter = inc ? min : max;
+			counterReset = inc ? min : max;
 		}
 		
 		public void next()
 		{
-			if(inc)
+			counter += amount;
+			
+			if((inc && counter > max) || (!inc && counter < min)) 
 			{
-				counter += 2;
-				if(counter > max)
-				{
-					counter = min;
-					wasoverflow = true;
-				}
-			}
-			else
-			{
-				counter -= 2;
-				if(counter < min)
-				{
-					counter = max;
-					wasoverflow = true;
-				}
+				counter = counterReset;
+				wasoverflow = true;
 			}
 		}
 		
@@ -124,7 +119,7 @@ public class Locator
 		
 		public void reset()
 		{
-			counter = inc ? min : max;
+			counter = counterReset;
 			wasoverflow = false;
 		}
 	}
