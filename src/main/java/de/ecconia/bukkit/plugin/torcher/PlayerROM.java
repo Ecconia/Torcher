@@ -1,11 +1,16 @@
 package de.ecconia.bukkit.plugin.torcher;
 
+import static de.ecconia.bukkit.plugin.torcher.TorcherPlugin.prefix;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.type.RedstoneWallTorch;
 import org.bukkit.entity.Player;
+
+import de.ecconia.bukkit.plugin.torcher.helpers.StringHelper;
+import de.ecconia.bukkit.plugin.torcher.placement.Locator;
 
 public class PlayerROM
 {
@@ -14,40 +19,31 @@ public class PlayerROM
 	private final Location max;
 	private final TorchDirection direction;
 	
-	//BitPosition
-	private final int maxCounter;
-	private int counter;
-	
-	//Start point
-	private final int xs;
-	private final int ys;
-	private final int zs;
-	
-	//bitsInformation
-	private final int bitsPerLayer;
-	private final int bitsPerLine;
-	
+	//Position helper
+	private final Locator locator;
+
 	//Factory begin///////////////////////////////////////////////////////////////
 	
-	public static PlayerROM create(Player player, Location min, Location max)
+	public static PlayerROM create(Player player, Location min, Location max, String[] extraArgs)
 	{
 		TorchDirection direction = TorchDirection.create(player);
 		if(direction == null)
 		{
+			player.sendMessage(prefix + "Could not determine your player rotation.");
 			return null;
 		}
 		
 		//Check width: (must be odd)
 		if(isOddWidth(min, max, direction))
 		{
-			player.sendMessage(TorcherPlugin.prefix + "The width of your ROM should be odd.");
+			player.sendMessage(prefix + "The width of your ROM should be odd.");
 			return null;
 		}
 		
 		//Check length: (bigger than 1)
 		if((direction.isParaX() ? max.getBlockZ() - min.getBlockZ() : max.getBlockX() - min.getBlockX()) < 1)
 		{
-			player.sendMessage(TorcherPlugin.prefix + "The length of your ROM should be bigger than 1.");
+			player.sendMessage(prefix + "The length of your ROM should be bigger than 1.");
 			return null;
 		}
 		
@@ -56,7 +52,7 @@ public class PlayerROM
 		{
 			if(max.getBlockY() == min.getBlockY())
 			{
-				player.sendMessage(TorcherPlugin.prefix + "You should select a ROM, not random redstone.");
+				player.sendMessage(prefix + "You should select a ROM, not random redstone.");
 				return null;
 			}
 			
@@ -93,7 +89,76 @@ public class PlayerROM
 			min.setY(max.getBlockY() - blocks);
 		}
 		
-		return new PlayerROM(min, max, direction);
+		//Invlaid arg count:
+		if(extraArgs.length != 0 && extraArgs.length != 3)
+		{
+			player.sendMessage(prefix + "Usage: \"/torcher define\"");
+			//TODO: Help for the flipping options.
+		}
+		
+		char vectors[] = {'l', 'b', 'd'};
+		
+		//Extra options:
+		//TODO: For now this is 3, later guessing should be implemented.
+		if(extraArgs.length == 3)
+		{
+			boolean hadW = false;
+			boolean hadH = false;
+			boolean hadD = false;
+			
+			for(int i = 0; i < extraArgs.length; i++)
+			{
+				String argument = extraArgs[i];
+				if(StringHelper.partOf(argument, "right", "left", "up", "down", "back", "forward"))
+				{
+					char directionChar = argument.charAt(0);
+					if((int)directionChar < 97)
+					{
+						directionChar += 32;
+					}
+					
+					switch(directionChar)
+					{
+					case 'r':
+					case 'l':
+						if(hadW)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the width of the ROM (multiple left/right).");
+							return null;
+						}
+						hadW = true;
+						break;
+					case 'f':
+					case 'b':
+						if(hadD)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the depth of the ROM (multiple back/forward).");
+							return null;
+						}
+						hadD = true;
+						break;
+					case 'u':
+					case 'd':
+						if(hadH)
+						{
+							player.sendMessage(prefix + "You supplied two directions for the hight of the ROM (multiple up/down).");
+							return null;
+						}
+						hadH = true;
+						break;
+					}
+					
+					vectors[i] = directionChar;
+				}
+				else
+				{
+					player.sendMessage(prefix + "Cannot parse argument \"" + argument + "\" to: right, left, up, down, back, forward.");
+					return null;
+				}
+			}
+		}
+		
+		return new PlayerROM(min, max, direction, vectors[0], vectors[1], vectors[2]);
 	}
 	
 	private static boolean isOddWidth(Location min, Location max, TorchDirection direction)
@@ -123,93 +188,60 @@ public class PlayerROM
 	
 	//Factory end/////////////////////////////////////////////////////////////////
 	
-	private PlayerROM(Location min, Location max, TorchDirection direction)
+	private PlayerROM(Location min, Location max, TorchDirection direction, char first, char second, char third)
 	{
 		this.min = min;
 		this.max = max;
 		this.direction = direction;
 		
-		bitsPerLine = widthDiff(min, max, direction) / 2 + 1;
-		bitsPerLayer = bitsPerLine * (lengthDiff(min, max, direction) + 1) / 2;
-		
-		//calculate max
-		counter = 0;
-		maxCounter = getAddresses() * bitsPerLine;
-		
-		xs = direction.isMaxX() ? max.getBlockX() : min.getBlockX();
-		ys = max.getBlockY();
-		zs = direction.isMaxZ() ? max.getBlockZ() : min.getBlockZ();
+		locator = new Locator(min, max, direction.getBlockFace(), first, second, third);
 	}
 	
-	public void resetCounter(Player player)
+	public void resetCounter()
 	{
-		counter = 0;
-		player.sendMessage(TorcherPlugin.prefix + "Last paste position has been resetted.");
+		locator.reset();
 	}
 	
-	public void dataInput(Player player, String para)
+	public void dataInput(Player player, String binaryInput)
 	{
-		final int bitMax = 15;
 		int counter = 0;
-		boolean bits[] = new boolean[para.length() * 15];
+		boolean bits[] = new boolean[binaryInput.length() * 15];
 		
-		doublebreak:
+		for(int letter = 0; letter < binaryInput.length(); letter++)
 		{
-			for(int letter = 0; letter < para.length(); letter++)
+			int number = binaryInput.charAt(letter) - 256;
+			
+			for(int bit = 0; bit < 15; bit++)
 			{
-				int number = para.charAt(letter) - 256;
-				//	String filler = "";
-				//	for (int i = 0; i < (bitMax - Integer.toBinaryString(number).length()); i++)
-				//	{
-				//		filler += '0';
-				//	}
-				//	player.sendMessage("Processing: " + filler + Integer.toBinaryString(number) + " " + number);
-				for(int bit = 0; bit < bitMax; bit++)
-				{
-					if(this.counter + counter < maxCounter)
-					{
-						bits[counter++] = ((number & (1 << bit)) > 0 ? true : false);
-					}
-					else
-					{
-						break doublebreak;
-					}
-				}
+				bits[counter++] = ((number & (1 << bit)) > 0 ? true : false);
 			}
 		}
-		int bitsLeft = (para.length() * 15) - counter;
-		player.sendMessage(TorcherPlugin.prefix + "Read " + counter + " bits. " + (bitsLeft > 14 ? "You send more data then the ROM can hold. " + bitsLeft + " bits are left." : ""));
-		//	String code = "Code: ";
-		//	or (int offset = 0; offset < counter; offset += 4)
-		//	{
-		//		try
-		//		{
-		//			code += (int) (((bits[offset] ? 1 : 0) << 0) | ((bits[offset + 1] ? 1 : 0) << 1) | ((bits[offset + 2] ? 1 : 0) << 2) | ((bits[offset + 3] ? 1 : 0) << 3));
-		//			code += " ";
-		//		}
-		//		catch (Exception e)
-		//		{
-		//			player.sendMessage(e.getClass().getSimpleName());
-		//		}
-		//	}
-		//	player.sendMessage(code);
-		placeTorches(player, counter, bits);
+		
+		placeTorches(player, bits);
 	}
 	
-	private void placeTorches(Player player, int amount, boolean[] data)
+	private void placeTorches(Player player, boolean[] bits)
 	{
-		Location loc = null;
-		boolean broke = false;
+		Location loc;
+		int bitsWritten = 0;
 		
-		for(int i = 0; i < amount; i++)
+		for(int i = 0; i < bits.length; i++)
 		{
-			loc = getTorchLocation(i + counter);
+			loc = locator.getNextLocation();
+			if(loc == null)
+			{
+				resetCounter();
+				player.sendMessage(prefix + "Abort writing: You send more data then the ROM can hold.");
+				player.sendMessage(prefix + "Wrote " + bitsWritten + "/" + bits.length + ".");
+				return;
+			}
+			
 			BlockState state = loc.getBlock().getState();
 			Material oldType = state.getType();
 			
 			if(oldType == Material.AIR || oldType == Material.REDSTONE_WALL_TORCH)
 			{
-				if(data[i])
+				if(bits[i])
 				{
 					state.setType(Material.REDSTONE_WALL_TORCH);
 					RedstoneWallTorch blockData = (RedstoneWallTorch) state.getBlockData();
@@ -223,40 +255,16 @@ public class PlayerROM
 			}
 			else
 			{
-				broke = true;
-				break;
+				resetCounter();
+				player.sendMessage(prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, replacing could damage something. Fix the ROM or correct the selection.");
+				return;
 			}
+			
+			//Increment counter, for each bit placed.
+			bitsWritten++;
 		}
 		
-		if(broke)
-		{
-			this.counter = 0;
-			player.sendMessage(TorcherPlugin.prefix + ChatColor.RED + "Aborted writing" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, replacing could damage something. Fix the ROM or correct the selection.");
-			return;
-		}
-		
-		counter += amount;
-		player.sendMessage(TorcherPlugin.prefix + "Finished writing bits to ROM.");
-	}
-	
-	private Location getTorchLocation(int position)
-	{
-		int layer = position % bitsPerLayer;
-		
-		int width = layer % bitsPerLine;
-		int length = layer / bitsPerLine;
-		int heigth = position / bitsPerLayer;
-		
-		switch(direction.getData())
-		{
-		case TorchDirection.North:
-			return new Location(min.getWorld(), xs + width * 2, ys - heigth * 4, zs - length * 2 - 1);
-		case TorchDirection.East:
-			return new Location(min.getWorld(), xs + length * 2 + 1, ys - heigth * 4, zs + width * 2);
-		case TorchDirection.South:
-			return new Location(min.getWorld(), xs - width * 2, ys - heigth * 4, zs + length * 2 + 1);
-		}
-		return new Location(min.getWorld(), xs - length * 2 - 1, ys - heigth * 4, zs - width * 2);
+		player.sendMessage(prefix + "Wrote " + bitsWritten + " bits to ROM.");
 	}
 	
 	//Output-Helper
@@ -268,7 +276,7 @@ public class PlayerROM
 	
 	public int getBitwidth()
 	{
-		return bitsPerLine;
+		return widthDiff(min, max, direction) / 2 + 1;
 	}
 	
 	public String getDirectionString()

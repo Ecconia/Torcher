@@ -129,7 +129,13 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					return true;
 				}
 				
-				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint());
+				String extraArgs[] = new String[args.length-1];
+				if(extraArgs.length > 0)
+				{
+					System.arraycopy(args, 1, extraArgs, args.length, extraArgs.length);
+				}
+				
+				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint(), extraArgs);
 				if(rom != null)
 				{
 					roms.put(player.getUniqueId(), rom);
@@ -142,7 +148,8 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 				{
 					if(StringHelper.partOf(args[0], "reset"))
 					{
-						roms.get(player.getUniqueId()).resetCounter(player);
+						roms.get(player.getUniqueId()).resetCounter();
+						player.sendMessage(TorcherPlugin.prefix + "Last paste position has been resetted.");
 					}
 					else
 					{
