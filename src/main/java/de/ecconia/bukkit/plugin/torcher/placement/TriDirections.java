@@ -20,9 +20,9 @@ public class TriDirections<T>
 	public TriDirections(BlockFace direction, char f, char s, char t)
 	{
 		//Create objects for linking the same data.
-		Direction<T> first = new Direction<>(f);
-		Direction<T> second = new Direction<>(s);
-		Direction<T> third = new Direction<>(t);
+		first = new Direction<>(f);
+		second = new Direction<>(s);
+		third = new Direction<>(t);
 		
 		//Sort each direction to its corrosponding ROM (whd) axis.
 		sortAxis(first);
