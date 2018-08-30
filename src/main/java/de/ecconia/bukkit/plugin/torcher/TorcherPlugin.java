@@ -132,7 +132,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 				String extraArgs[] = new String[args.length-1];
 				if(extraArgs.length > 0)
 				{
-					System.arraycopy(args, 1, extraArgs, args.length, extraArgs.length);
+					System.arraycopy(args, 1, extraArgs, 0, extraArgs.length);
 				}
 				
 				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint(), extraArgs);
