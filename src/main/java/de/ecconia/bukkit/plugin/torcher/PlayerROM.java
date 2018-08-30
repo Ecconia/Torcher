@@ -90,6 +90,23 @@ public class PlayerROM
 			min.setY(max.getBlockY() - blocks);
 		}
 		
+		//Subtract one from back of ROM, to have the location set on the torch:
+		switch(direction.getData())
+		{
+		case TorchDirection.North:
+			max.setZ(max.getBlockZ() - 1);
+			break;
+		case TorchDirection.East:
+			min.setX(min.getBlockX() + 1);
+			break;
+		case TorchDirection.South:
+			min.setZ(min.getBlockZ() + 1);
+			break;
+		case TorchDirection.West:
+			max.setX(max.getBlockX() - 1);
+			break;
+		}
+		
 		//Invlaid arg count:
 		if(extraArgs.length != 0 && extraArgs.length != 3)
 		{
@@ -273,7 +290,7 @@ public class PlayerROM
 	
 	public int getAddresses()
 	{
-		return (lengthDiff(min, max, direction) + 1) / 2 * ((max.getBlockY() - min.getBlockY()) / 4 + 1);
+		return ((lengthDiff(min, max, direction) + 1) / 2 + 1) * ((max.getBlockY() - min.getBlockY()) / 4 + 1);
 	}
 	
 	public int getBitwidth()
