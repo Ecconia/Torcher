@@ -203,9 +203,9 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	private static void sendFeedback(Player player, String title1, String title2, String...subLines)
 	{
 		List<String> lines = new ArrayList<>();
-		lines.add(ChatColor.GOLD + "Torcher " + ChatColor.WHITE + title1 + ChatColor.GRAY + title2 + ":");
+		lines.add(ChatColor.GOLD + "Torcher " + ChatColor.WHITE + title1 + " " + ChatColor.GRAY + title2 + ":");
 		
-		for(int i = 0; i < subLines.length / 2; i += 2)
+		for(int i = 0; i < subLines.length; i += 2)
 		{
 			String details = subLines[i+1];
 			if(!details.isEmpty())
