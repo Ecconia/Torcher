@@ -182,21 +182,21 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	{
 		sendFeedback(player, "Command", "Help",
 			"about", "Information about how this plugin works.",
-			"tools", "Here you'll find tools that compress the data for you.",
+			"tools", "Here you will find programs which compress the binary data for you.",
 			"define [head direction]", "Select a normal torch ROM with WorldEdit, look in the same direction as the torches and use this command.",
-			"reset", "Resets the counter, if you want to write from address 0 again.",
-			"binary <data>", "Send the compressed data using this command.",
-			"Smaller Commands", "You can leave characters away in a command: \"/torcher define\" = \"/torcher d\"."
+			"reset", "Resets the last bit paste position, to start from address 0 again.",
+			"binary <data>", "Send compressed <data>.",
+			"Smaller Commands", "You can shorten subcommands: \"/torcher define\" = \"/torcher d\"."
 		);
 	}
 	
 	private static void printAbout(Player player)
 	{
 		sendFeedback(player, "About", "Page",
-			"ROM's", "ROM's are the base of all standard computers. You have to select the ROM you want to flash with binary data. The direction the torches are facing is the direction of the ROM. Torches have [ ]-o --this-> direction.",
-			"Data", "To send as many bits as possible to the ROM each letter in the send command sends 15 Bits at once (not less). It's possible to send 89 letters with the command, that makes 1335 bits per command.",
-			"Compression", "The order of the bits is defined and can't be changed. If you look in the torch direction the first bit is always left. The first addresses are in the top layer of your ROM. The first address is at the front (torchdirection).",
-			"Author", "This Plugin was written by the player Ecconia, since he totally sucks at placing torches in ROM's. It should get the input by an automated typer though chat."
+			"ROM's", "Most simple Minecraft ROM's for CPU's use a simple torch ROM (cell/bit = 2*4*2). Selection such a ROM with Worldedit and look into the direction the torches are facing ( [ ]-o --ThisDirection--> ) while defining it. Now you are able to flash binary data into it.",
+			"Data/Compression", "To send as many bits as possible to the ROM each letter in the send command sends 15 Bits at once (not less). It's possible to send 245 letters with the command, that makes 3675 bits per command.",
+			"Placement", "The order of bits cannot be changed, but the way they are inserted into the ROM. You can define which axis should be filled first, second and last. Its also possible in which direction each axis should be filled. To define this add (right, left; up, down; back, forward) to the define command.",
+			"Author", "This Plugin was written by the player Ecconia, since he totally sucks at placing torches in ROM's. Now there is a faster way to do this."
 		);
 	}
 	
