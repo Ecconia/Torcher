@@ -93,11 +93,12 @@ public class PlayerROM
 		//Invlaid arg count:
 		if(extraArgs.length != 0 && extraArgs.length != 3)
 		{
-			player.sendMessage(prefix + "Usage: \"/torcher define\"");
+			player.sendMessage(prefix + "Usage: \"/torcher define [f s t]\"");
 			//TODO: Help for the flipping options.
+			return null;
 		}
 		
-		char vectors[] = {'l', 'b', 'd'};
+		char vectors[] = {'l', 'b', 'u'};
 		
 		//Extra options:
 		//TODO: For now this is 3, later guessing should be implemented.
