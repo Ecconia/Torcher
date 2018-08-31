@@ -1,7 +1,8 @@
 # Torcher Plugin
 A Bukkit plugin which eats binary code from chat and inserts it into a simple redstone torch ROM.
 
-A Bukkit plugin which is compatible with 1.12.2.
+Plugin is compatible with 1.13.1, NOT with 1.12.2 anymore.
+
 
 Its required to use an additional program to compress binary into some unicode format which allows to send 3675 bits per chat line.
 

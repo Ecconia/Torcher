@@ -1,6 +1,7 @@
 main: ${groupId}.${artifactId}Plugin
 name: ${artifactId}
 version: ${version}
+api-version: 1.13
 
 author: Ecconia
 description: A plugin for autoplacing torches in a ROM.
