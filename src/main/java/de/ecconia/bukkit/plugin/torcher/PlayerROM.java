@@ -6,9 +6,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.data.type.RedstoneWallTorch;
 import org.bukkit.entity.Player;
-import org.bukkit.material.MaterialData;
-import org.bukkit.material.Torch;
 
 import de.ecconia.bukkit.plugin.torcher.helpers.StringHelper;
 import de.ecconia.bukkit.plugin.torcher.placement.Locator;
@@ -258,13 +257,13 @@ public class PlayerROM
 			BlockState state = loc.getBlock().getState();
 			Material oldType = state.getType();
 			
-			if (oldType.equals(Material.AIR) || oldType.equals(Material.REDSTONE_TORCH_OFF) || oldType.equals(Material.REDSTONE_TORCH_ON))
+			if(oldType == Material.AIR || oldType == Material.REDSTONE_WALL_TORCH)
 			{
 				if(bits[i])
 				{
-					state.setType(Material.REDSTONE_TORCH_OFF); 
-					MaterialData mat = state.getData(); 
-					((Torch) mat).setFacingDirection(direction.getBlockFace());
+					state.setType(Material.REDSTONE_WALL_TORCH);
+					RedstoneWallTorch blockData = (RedstoneWallTorch) state.getBlockData();
+					blockData.setFacing(direction.getBlockFace());
 				}
 				else
 				{

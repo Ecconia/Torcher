@@ -16,10 +16,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.sk89q.worldedit.bukkit.selections.Selection;
-
 import de.ecconia.bukkit.plugin.torcher.helpers.StringHelper;
 import de.ecconia.bukkit.plugin.torcher.helpers.WorldEditHelper;
+import de.ecconia.bukkit.plugin.torcher.helpers.WorldEditHelper.Selection;
 
 public class TorcherPlugin extends JavaPlugin implements Listener
 {
@@ -135,7 +134,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					System.arraycopy(args, 1, extraArgs, 0, extraArgs.length);
 				}
 				
-				PlayerROM rom = PlayerROM.create(player, s.getMinimumPoint(), s.getMaximumPoint(), extraArgs);
+				PlayerROM rom = PlayerROM.create(player, s.getMin(), s.getMax(), extraArgs);
 				if(rom != null)
 				{
 					roms.put(player.getUniqueId(), rom);
