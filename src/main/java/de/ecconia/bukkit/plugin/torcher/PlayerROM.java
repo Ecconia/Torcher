@@ -264,6 +264,7 @@ public class PlayerROM
 					state.setType(Material.REDSTONE_WALL_TORCH);
 					RedstoneWallTorch blockData = (RedstoneWallTorch) state.getBlockData();
 					blockData.setFacing(direction.getBlockFace());
+					state.setBlockData(blockData);
 				}
 				else
 				{
