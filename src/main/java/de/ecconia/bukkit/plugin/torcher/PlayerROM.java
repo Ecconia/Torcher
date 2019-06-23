@@ -21,7 +21,7 @@ public class PlayerROM
 	
 	//Position helper
 	private final Locator locator;
-
+	
 	//Factory begin///////////////////////////////////////////////////////////////
 	
 	public static PlayerROM create(Player player, Location min, Location max, String[] extraArgs)
@@ -130,7 +130,7 @@ public class PlayerROM
 				if(StringHelper.partOf(argument, "right", "left", "up", "down", "back", "forward"))
 				{
 					char directionChar = argument.charAt(0);
-					if((int)directionChar < 97)
+					if((int) directionChar < 97)
 					{
 						directionChar += 32;
 					}
