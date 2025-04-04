@@ -2,6 +2,8 @@ package de.ecconia.bukkit.plugin.torcher;
 
 import static de.ecconia.bukkit.plugin.torcher.TorcherPlugin.prefix;
 
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -284,6 +286,31 @@ public class PlayerROM
 		}
 		
 		player.sendMessage(prefix + "Wrote " + bitsWritten + " bits to ROM.");
+	}
+	
+	public void dumpData(Player player) {
+		var stringBuilder = new StringBuilder();
+		
+		locator.reset(); //Start from the beginning.
+		Location loc = locator.getNextLocation();
+		while(loc != null)
+		{
+			var material = loc.getBlock().getState().getType();
+			switch (material) {
+				case AIR -> stringBuilder.append('0');
+				case REDSTONE_WALL_TORCH -> stringBuilder.append('1');
+				default -> {
+					player.sendMessage(prefix + ChatColor.RED + "Aborted dumping" + ChatColor.GRAY + ": Block at x:" + loc.getBlockX() + " y:" + loc.getBlockY() + " z:" + loc.getBlockZ() + " is not a redstone torch or air, cannot gather bit value. Fix the ROM or correct the selection.");
+					return;
+				}
+			}
+			
+			loc = locator.getNextLocation();
+		}
+		
+		var clickableText = new TextComponent(stringBuilder.toString());
+		clickableText.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "http://" + stringBuilder)); //For the clicking to work, it must be a "valid enough" URL
+		player.spigot().sendMessage(new TextComponent(prefix + "Data: "), clickableText);
 	}
 	
 	//Output-Helper

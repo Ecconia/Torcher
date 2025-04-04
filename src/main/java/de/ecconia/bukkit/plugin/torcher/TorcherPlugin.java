@@ -146,6 +146,17 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 					player.sendMessage(prefix + "ROM with " + rom.getAddresses() + " addresses of each " + rom.getBitwidth() + " bits defined. " + " Direction: " + rom.getDirectionString());
 				}
 			}
+			else if(StringHelper.partOf(args[0], "dump")) //Must be checked after 'define' to allow 'define' be triggered by '/torcher d'.
+			{
+				var rom = roms.get(player.getUniqueId());
+				if(rom == null)
+				{
+					player.sendMessage(prefix + "You have to select a ROM with WorldEdit and use \"/torcher define\".");
+					return true;
+				}
+				
+				rom.dumpData(player);
+			}
 			else
 			{
 				if(roms.containsKey(player.getUniqueId()))
@@ -178,7 +189,8 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			"tools", "",
 			"define [head direction]", "",
 			"reset", "",
-			"binary <data>", ""
+			"binary <data>", "",
+			"dump", ""
 		);
 	}
 	
@@ -190,6 +202,7 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 			"define [head direction]", "Select a normal torch ROM with WorldEdit, look in the same direction as the torches and use this command.",
 			"reset", "Resets the last bit paste position, to start from address 0 again.",
 			"binary <data>", "Send compressed <data>.",
+			"dump", "Reads the binary content of a defined ROM and dumps it into chat as a binary string (which you can copy as URL).",
 			"Smaller Commands", "You can shorten subcommands: \"/torcher define\" = \"/torcher d\"."
 		);
 	}
