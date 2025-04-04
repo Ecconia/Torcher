@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -44,9 +43,15 @@ public class TorcherPlugin extends JavaPlugin implements Listener
 	@EventHandler(priority=EventPriority.NORMAL)
 	public void onAllCommands(PlayerCommandPreprocessEvent event)
 	{
-		if(StringUtils.startsWithIgnoreCase(event.getMessage(), "/torcher "))
+		var message = event.getMessage();
+		var prefix = "/torcher ";
+		if(message.length() <= prefix.length())
 		{
-			String commandContent = event.getMessage().substring("/torcher ".length()).trim();
+			return;
+		}
+		if(message.substring(0, prefix.length()).toLowerCase().equals(prefix))
+		{
+			String commandContent = message.substring(prefix.length()).trim();
 			int firstSpace = commandContent.indexOf(' ');
 			
 			if(firstSpace >= 0)
