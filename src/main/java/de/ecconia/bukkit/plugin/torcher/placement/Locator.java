@@ -8,13 +8,13 @@ public class Locator
 {
 	private final World world;
 	
-	private BiLoopTwo xBi;
-	private BiLoopTwo yBi;
-	private BiLoopTwo zBi;
+	private final BiLoopTwo xBi;
+	private final BiLoopTwo yBi;
+	private final BiLoopTwo zBi;
 	
-	private BiLoopTwo iBi;
-	private BiLoopTwo mBi;
-	private BiLoopTwo oBi;
+	private final BiLoopTwo iBi;
+	private final BiLoopTwo mBi;
+	private final BiLoopTwo oBi;
 	
 	public Locator(Location min, Location max, BlockFace torchDir, char first, char second, char third)
 	{
@@ -80,7 +80,7 @@ public class Locator
 		private final int counterReset;
 		
 		private int counter;
-		private boolean wasoverflow;
+		private boolean wasOverflow;
 		
 		public BiLoopTwo(int min, int max, boolean inc, int amount)
 		{
@@ -101,7 +101,7 @@ public class Locator
 			if((inc && counter > max) || (!inc && counter < min)) 
 			{
 				counter = counterReset;
-				wasoverflow = true;
+				wasOverflow = true;
 			}
 		}
 		
@@ -112,17 +112,17 @@ public class Locator
 		
 		public boolean wasLastOverflow()
 		{
-			boolean wasoverlow = this.wasoverflow;
+			boolean wasOverflow = this.wasOverflow;
 			
-			this.wasoverflow = false;
+			this.wasOverflow = false;
 			
-			return wasoverlow;
+			return wasOverflow;
 		}
 		
 		public void reset()
 		{
 			counter = counterReset;
-			wasoverflow = false;
+			wasOverflow = false;
 		}
 	}
 }

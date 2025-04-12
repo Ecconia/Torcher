@@ -6,7 +6,7 @@ api-version: 1.20
 depends: [WorldEdit]
 
 author: Ecconia
-description: A plugin for autoplacing torches in a ROM.
+description: A plugin for auto-placing torches in a ROM.
 
 commands:
     torcher:

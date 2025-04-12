@@ -58,47 +58,37 @@ public class TorchDirection
 
 	public String getDirection()
 	{
-		switch (data) {
-		case North:
-			return "North";
-		case East:
-			return "East";
-		case South:
-			return "South";
-		case West:
-			return "West";
-		}
-		return "";
+		return switch (data) {
+			case North -> "North";
+			case East -> "East";
+			case South -> "South";
+			case West -> "West";
+			default -> "";
+		};
 	}
 	
 	public BlockFace getBlockFace()
 	{
-		switch (data) {
-		case North:
-			return BlockFace.NORTH;
-		case East:
-			return BlockFace.EAST;
-		case South:
-			return BlockFace.SOUTH;
-		}
-		return BlockFace.WEST;
+		return switch (data) {
+			case North -> BlockFace.NORTH;
+			case East -> BlockFace.EAST;
+			case South -> BlockFace.SOUTH;
+			default -> BlockFace.WEST;
+		};
 	}
 
 	public boolean isMaxX()
 	{
-		if (data == East || data == North) { return false; }
-		return true;
+		return data != East && data != North;
 	}
 
 	public boolean isMaxZ()
 	{
-		if (data == East || data == South) { return false; }
-		return true;
+		return data != East && data != South;
 	}
 
 	public boolean isParaX()
 	{
-		if (data == East || data == West) { return false; }
-		return true;
+		return data != East && data != West;
 	}
 }

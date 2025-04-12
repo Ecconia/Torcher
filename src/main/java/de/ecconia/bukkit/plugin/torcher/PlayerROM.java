@@ -108,7 +108,7 @@ public class PlayerROM
 			break;
 		}
 		
-		//Invlaid arg count:
+		//Invalid arg count:
 		if(extraArgs.length != 0 && extraArgs.length != 3)
 		{
 			player.sendMessage(prefix + "Usage: \"/torcher define [f s t]\"");
@@ -116,7 +116,7 @@ public class PlayerROM
 			return null;
 		}
 		
-		char vectors[] = {'l', 'b', 'u'};
+		char[] vectors = {'l', 'b', 'u'};
 		
 		//Extra options:
 		//TODO: For now this is 3, later guessing should be implemented.
@@ -225,7 +225,7 @@ public class PlayerROM
 	public void dataInput(Player player, String binaryInput)
 	{
 		int counter = 0;
-		boolean bits[] = new boolean[binaryInput.length() * 15];
+		boolean[] bits = new boolean[binaryInput.length() * 15];
 		
 		for(int letter = 0; letter < binaryInput.length(); letter++)
 		{
@@ -233,7 +233,7 @@ public class PlayerROM
 			
 			for(int bit = 0; bit < 15; bit++)
 			{
-				bits[counter++] = ((number & (1 << bit)) > 0 ? true : false);
+				bits[counter++] = ((number & (1 << bit)) > 0);
 			}
 		}
 		

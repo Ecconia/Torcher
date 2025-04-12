@@ -4,17 +4,17 @@ import org.bukkit.block.BlockFace;
 
 public class TriDirections<T>
 {
-	Direction<T> first;
-	Direction<T> second;
-	Direction<T> third;
+	private final Direction<T> first;
+	private final Direction<T> second;
+	private final Direction<T> third;
 	
-	Direction<T> width;
-	Direction<T> depth;
-	Direction<T> hight;
+	private Direction<T> width;
+	private Direction<T> depth;
+	private Direction<T> height;
 	
-	Direction<T> xDir;
-	Direction<T> yDir;
-	Direction<T> zDir;
+	private final Direction<T> xDir;
+	private final Direction<T> yDir;
+	private final Direction<T> zDir;
 	
 	public TriDirections(BlockFace direction, char f, char s, char t)
 	{
@@ -23,87 +23,71 @@ public class TriDirections<T>
 		second = new Direction<>(s);
 		third = new Direction<>(t);
 		
-		//Sort each direction to its corrosponding ROM (whd) axis.
+		//Sort each direction to its corresponding ROM (whd) axis.
 		sortAxis(first);
 		sortAxis(second);
 		sortAxis(third);
 		
-		//Sort each direction to its corrosponding xyz axis.
-		yDir = hight;
-		switch (direction)
-		{
-		case NORTH:
-		case SOUTH:
-			zDir = depth;
-			xDir = width;
-			break;
-		case EAST:
-		case WEST:
-			xDir = depth;
-			zDir = width;
-			break;
-		default:
-			throw new InternalError("Received a BlockFace which should never happen to be here: " + direction.toString());
+		//Sort each direction to its corresponding xyz axis.
+		yDir = height;
+		switch (direction) {
+			case NORTH, SOUTH -> {
+				zDir = depth;
+				xDir = width;
+			}
+			case EAST, WEST -> {
+				xDir = depth;
+				zDir = width;
+			}
+			default -> throw new InternalError("Received a BlockFace which should never happen to be here: " + direction);
 		}
 		
 		//Determine, if an axis is incrementing or decrementing.
-		hight.setIncreasing(hight.getChar() == 'u');
-		if(direction == BlockFace.WEST)
-		{
-			depth.setIncreasing(depth.getChar() == 'b');
-			width.setIncreasing(width.getChar() == 'l');
-		}
-		else if(direction == BlockFace.EAST)
-		{
-			depth.setIncreasing(depth.getChar() == 'f');
-			width.setIncreasing(width.getChar() == 'r');
-		}
-		else if(direction == BlockFace.NORTH)
-		{
-			depth.setIncreasing(depth.getChar() == 'b');
-			width.setIncreasing(width.getChar() == 'r');
-		}
-		else if(direction == BlockFace.SOUTH)
-		{
-			depth.setIncreasing(depth.getChar() == 'f');
-			width.setIncreasing(width.getChar() == 'l');
+		height.setIncreasing(height.getChar() == 'u');
+		switch (direction) {
+			case WEST -> {
+				depth.setIncreasing(depth.getChar() == 'b');
+				width.setIncreasing(width.getChar() == 'l');
+			}
+			case EAST -> {
+				depth.setIncreasing(depth.getChar() == 'f');
+				width.setIncreasing(width.getChar() == 'r');
+			}
+			case NORTH -> {
+				depth.setIncreasing(depth.getChar() == 'b');
+				width.setIncreasing(width.getChar() == 'r');
+			}
+			case SOUTH -> {
+				depth.setIncreasing(depth.getChar() == 'f');
+				width.setIncreasing(width.getChar() == 'l');
+			}
 		}
 	}
 	
-	private void sortAxis(Direction<T> d)
+	private void sortAxis(Direction<T> direction)
 	{
-		switch(d.getChar())
-		{
-		case 'd':
-		case 'u':
-			hight = d;
-			break;
-		case 'l':
-		case 'r':
-			width = d;
-			break;
-		case 'b':
-		case 'f':
-			depth = d;
-			break;
+		switch (direction.getChar()) {
+			case 'd', 'u' -> height = direction;
+			case 'l', 'r' -> width = direction;
+			case 'b', 'f' -> depth = direction;
 		}
 	}
 	
 	private static class Direction<T>
 	{
-		private final char c;
+		private final char character;
 		
 		private boolean increasing;
 		private T object;
 		
-		public Direction(char c)
+		public Direction(char character)
 		{
-			this.c = c;
+			this.character = character;
 		}
 		
 		public char getChar()
 		{
-			return c;
+			return character;
 		}
 		
 		public void setIncreasing(boolean increasing)
