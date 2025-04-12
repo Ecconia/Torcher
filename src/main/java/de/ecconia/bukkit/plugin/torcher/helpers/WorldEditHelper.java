@@ -32,7 +32,6 @@ public class WorldEditHelper
 		}
 		
 		LocalSession session = plugin.getSession(player);
-		
 		World weWorld = session.getSelectionWorld();
 		
 		//No selection world, no selection
@@ -42,12 +41,10 @@ public class WorldEditHelper
 			return null;
 		}
 		
-		if(!(weWorld instanceof BukkitWorld))
+		if(!(weWorld instanceof BukkitWorld weBWorld))
 		{
 			throw new InternalError("Expected getSelectionWorld() in WE API to return a BukkitWorld, but it was " + weWorld.getClass().getSimpleName());
 		}
-		
-		BukkitWorld weBWorld = (BukkitWorld) weWorld;
 		
 		if(weBWorld.getWorld() != player.getWorld())
 		{
@@ -57,7 +54,7 @@ public class WorldEditHelper
 		
 		RegionSelector selector = session.getRegionSelector(weWorld);
 		
-		if(!(selector instanceof CuboidRegionSelector))
+		if(!(selector instanceof CuboidRegionSelector cuboidRegionSelector))
 		{
 			player.sendMessage(prefix + "This command only accepts cuboid selection, use \"//sel ?\" if you don't know how to change your selection type.");
 			return null;
@@ -65,7 +62,7 @@ public class WorldEditHelper
 		
 		try
 		{
-			return new Selection(((CuboidRegionSelector) selector).getRegion(), player.getWorld());
+			return new Selection(cuboidRegionSelector.getRegion(), player.getWorld());
 		}
 		catch (IncompleteRegionException e)
 		{
